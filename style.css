@@ -57,19 +57,31 @@ body {
   color: var(--text);
   font-weight: 900;
 }
-
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
+/* Nav link styles */
 
 .nav-link {
   text-decoration: none;
   color: var(--muted);
   font-size: 14px;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, border-bottom 0.2s ease;
   position: relative;
   padding: 4px 0;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
 }
 
 .nav-link:hover {
@@ -79,8 +91,6 @@ body {
 .nav-link.active {
   color: var(--text);
 }
-
-
 
 .search-bar {
   display: flex;
@@ -364,5 +374,5 @@ button {
 }
 
 .chat-fab svg {
-  color: #47af42; /* small green accent like Roblox */
+  color: #4292af; /* small green accent like Roblox */
 }

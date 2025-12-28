@@ -5,7 +5,8 @@
 
   function setActiveLink(page) {
     navLinks.forEach(link => {
-      link.classList.toggle("active", link.getAttribute("href") === `#${page}`);
+      const hrefPage = link.getAttribute("href").slice(1);
+      link.classList.toggle("active", hrefPage === page);
     });
   }
 
@@ -20,9 +21,8 @@
       const handler = module.default || module.init || module.render;
       if (typeof handler !== "function") throw new Error("No render function found");
 
-      container.innerHTML = ""; // clear previous content
+      container.innerHTML = "";
       handler(container);
-
     } catch (err) {
       container.innerHTML = `
         <h1 class="page-title">404</h1>

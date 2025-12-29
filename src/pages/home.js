@@ -14,7 +14,7 @@ function initHome(container) {
   loadHomeCSS();
 
   container.innerHTML = `
-    <h1 class="page-title"></h1>
+    <h1 class="page-title">Home</h1>
 
     <!-- Friends Section -->
     <section class="section">

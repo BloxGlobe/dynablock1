@@ -2,25 +2,24 @@
 .communities-layout {
   display: flex;
   height: 100%;
-  background: #0b0d10;
-  color: #fff;
-  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
 }
 
-/* ========== LEFT SIDEBAR (Joined communities) ========== */
+/* ========== LEFT SIDEBAR ========== */
 .communities-sidebar {
   width: 280px;
-  background: #14161a;
+  background: var(--panel);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid rgba(255,255,255,.08);
+  border-right: 1px solid var(--border);
 }
 
 /* Header */
 .sidebar-header {
   padding: 16px;
-  font-weight: 600;
   font-size: 15px;
+  font-weight: 700;
 }
 
 /* Search */
@@ -31,11 +30,10 @@
 .search-communities input {
   width: 100%;
   padding: 8px 8px 8px 32px;
-  border-radius: 6px;
-  border: none;
-  background: #1b1e24;
-  color: #fff;
-  outline: none;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
   font-size: 13px;
 }
 
@@ -43,61 +41,62 @@
 .communities-list {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 8px;
 }
 
 .community-item {
   padding: 10px 14px;
   margin: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 4px;
   font-size: 13px;
-  transition: background .15s ease;
+  cursor: pointer;
 }
 
 .community-item:hover {
-  background: rgba(255,255,255,.06);
-}
-
-/* Empty state */
-.empty {
-  padding: 16px;
-  font-size: 13px;
-  opacity: .6;
-}
-
-/* Create community */
-.create-community-btn {
-  margin: 16px;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #2b7cff;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.create-community-btn:hover {
-  opacity: .9;
-}
-
-/* ========== CENTER CONTENT (Community view) ========== */
-.community-content {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
+  background: var(--panel-soft);
 }
 
 /* Empty */
-.empty-state {
-  opacity: .7;
+.empty {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--muted);
 }
 
-.empty-state h2 {
-  margin: 0 0 6px;
+/* Create button */
+.create-community-btn {
+  margin: 16px;
+  padding: 10px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 13px;
   font-weight: 600;
+}
+
+.create-community-btn:hover {
+  background: var(--accent-hover);
+}
+
+/* ========== CENTER CONTENT ========== */
+.community-content {
+  flex: 1;
+  padding: 32px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,.25),
+    rgba(0,0,0,.4)
+  );
+  overflow-y: auto;
+}
+
+/* Empty state */
+.empty-state h2 {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.empty-state p {
+  color: var(--muted);
 }
 
 /* Header */
@@ -105,40 +104,31 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
 }
 
 /* Sections */
 .community-section {
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .community-section h3 {
+  font-size: 15px;
   margin-bottom: 6px;
-  font-size: 14px;
 }
 
 /* Leave */
 .leave-btn {
-  background: #ff3b3b;
-  border: none;
+  background: #e14c4c;
   padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: #fff;
+  border-radius: 4px;
   font-size: 13px;
 }
 
-.leave-btn:hover {
-  opacity: .9;
-}
-
-/* ========== RIGHT SIDEBAR (PREPARED, SAFE) ========== */
-/* JS does not inject this yet — styles are ready */
+/* ========== RIGHT SIDEBAR ========== */
 .community-right-sidebar {
   width: 260px;
-  background: #14161a;
-  border-left: 1px solid rgba(255,255,255,.08);
+  background: var(--panel);
+  border-left: 1px solid var(--border);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -146,31 +136,24 @@
 }
 
 .right-panel-section {
-  background: #1b1e24;
+  background: var(--panel-soft);
   padding: 12px;
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 13px;
 }
 
 .right-panel-section h4 {
-  margin: 0 0 6px;
+  margin-bottom: 6px;
   font-size: 13px;
-  opacity: .9;
 }
 
 /* ========== SCROLLBARS ========== */
 .communities-sidebar::-webkit-scrollbar,
 .community-content::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .communities-sidebar::-webkit-scrollbar-thumb,
 .community-content::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,.12);
-  border-radius: 4px;
-}
-
-.communities-sidebar::-webkit-scrollbar-thumb:hover,
-.community-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,.2);
+  background: var(--panel-soft);
 }

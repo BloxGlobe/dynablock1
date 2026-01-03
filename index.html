@@ -41,7 +41,6 @@
 
     <!-- Right Icons -->
     <div class="nav-right">
-      <!-- Settings Button (IMPORTANT) -->
       <a
         href="#"
         class="icon-btn settings-btn"
@@ -62,7 +61,17 @@
   <!-- Main Content -->
   <main class="main-content" id="mainContent"></main>
 
+  <div id="footer-root"></div>
+
   <!-- App entry -->
   <script type="module" src="src/main.js"></script>
+
+  <script type="module">
+    import initFooter from "./src/components/footer-module/footer.js";
+
+    const footerRoot = document.getElementById("footer-root");
+    if (footerRoot) initFooter(footerRoot);
+  </script>
+
 </body>
 </html>

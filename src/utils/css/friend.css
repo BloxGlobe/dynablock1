@@ -1,85 +1,96 @@
-/* Friends row */
+/* Friends Section - Now vertical like old Dynablock sidebar */
 .friends-container {
   display: flex;
-  gap: 14px;
-  padding: 8px 0 12px;
-  overflow-x: auto;
+  flex-direction: column;   /* Stack up and down instead of side-scroll */
+  gap: 12px;                /* Space between friends */
+  padding: 12px 8px;
+  max-height: 500px;        /* Limit height so it doesn't take whole page */
+  overflow-y: auto;         /* Scroll if many friends */
+  background: #f0f0f0;     /* Light gray like old web pages */
+  border: 2px solid #ccc;   /* Classic border */
+  border-radius: 8px;
 }
 
-/* Friend item */
+/* Friend item - Bigger and blockier */
 .friend-item {
-  width: 72px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #fff;         /* White card feel */
+  border: 1px solid #ddd;
+  border-radius: 6px;
   cursor: pointer;
-  flex-shrink: 0;
+  transition: background 0.2s;
 }
 
-/* Avatar */
+.friend-item:hover {
+  background: #e0e0ff;     /* Light blue hover like old buttons */
+}
+
+/* Avatar - Square with slight round (old Roblox was square-ish) */
 .friend-avatar {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 6px;
-  border-radius: 50%;
-  background: #1b1e24;
+  width: 60px;
+  height: 60px;
+  margin-right: 12px;       /* Space from name */
+  border-radius: 12px;      /* Slight round for cute retro */
+  background: #ffcc00;      /* Yellow like classic Roblox heads */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
   position: relative;
-  transition: background 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Small shadow for pop */
 }
 
-.friend-item:hover .friend-avatar {
-  background: #2b7cff;
+/* Add Friend button - Special style */
+.friend-item.add-friend {
+  justify-content: center;
+  background: #e0f7fa;
+  border: 2px dashed #00acc1;
 }
 
-/* Add friend */
 .friend-item.add-friend .friend-avatar {
   background: transparent;
-  border: 2px dashed rgba(255,255,255,.3);
-  color: rgba(255,255,255,.7);
+  border: none;
+  color: #00acc1;
+  font-size: 30px;
 }
 
-.friend-item.add-friend:hover .friend-avatar {
-  background: #1b1e24;
-  border-color: #2b7cff;
-  color: #2b7cff;
-}
-
-/* Name */
+/* Name - Bigger and bold */
 .friend-name {
-  font-size: 12px;
-  color: rgba(255,255,255,.75);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  flex-grow: 1;             /* Takes up space */
 }
 
-/* Online dot */
+/* Online dot - Classic green circle */
 .friend-avatar::after {
   content: "";
   position: absolute;
   bottom: 4px;
   right: 4px;
-  width: 10px;
-  height: 10px;
-  background: #22c55e;
-  border: 2px solid #0b0d10;
+  width: 14px;
+  height: 14px;
+  background: #4caf50;     /* Bright green */
+  border: 3px solid #fff;
   border-radius: 50%;
-  display: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: none;            /* Hidden by default */
 }
 
 .friend-item.online .friend-avatar::after {
-  display: block;
+  display: block;           /* Show when online */
 }
 
-/* Scrollbar (subtle) */
+/* Scrollbar - Retro subtle */
 .friends-container::-webkit-scrollbar {
-  height: 5px;
+  width: 8px;
 }
 
 .friends-container::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,.2);
+  background: #aaa;
   border-radius: 4px;
 }

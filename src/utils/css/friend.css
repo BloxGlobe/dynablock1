@@ -1,137 +1,72 @@
-
-
+/* Friends container */
 .friends-container {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  max-height: 100%;
-  overflow-y: auto;
-
-  background: var(--panel, #f0f0f0);
-  border: 1px solid var(--border, #ccc);
-  border-radius: 8px;
 }
 
-
+/* Friend item */
 .friend-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-
-  padding: 8px 10px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s;
 }
 
 .friend-item:hover {
-  background: #e8ebff;
-  border-color: #b5bdfc;
+  background: rgba(255,255,255,0.06);
 }
 
+/* Avatar — FULL ROUND like Roblox */
 .friend-avatar {
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-
-  border-radius: 10px; /* Square-ish retro feel */
-  background: #ffcc00;
-
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;              /* IMPORTANT */
+  background: #2a2a2a;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 22px;
   font-weight: 700;
-  color: #333;
-
+  color: #fff;
   position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
 }
 
-.friend-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-}
-
-.friend-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.friend-avatar::after {
+/* Online dot */
+.friend-item.online .friend-avatar::after {
   content: "";
   position: absolute;
-  bottom: 4px;
-  right: 4px;
-
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
   background: #4caf50;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-
-  display: none;
+  border: 2px solid #111;
+  border-radius: 50%;
 }
 
-.friend-item.online .friend-avatar::after {
-  display: block;
+/* Name */
+.friend-name {
+  font-size: 13px;
+  font-weight: 600;
 }
 
+/* Add Friend button — dashed circle like pic */
 .friend-item.add-friend {
   justify-content: center;
-  gap: 8px;
-
-  background: #e6f7fb;
-  border: 2px dashed #00acc1;
-}
-
-.friend-item.add-friend:hover {
-  background: #d9f1f7;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .friend-item.add-friend .friend-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255,255,255,0.4);
   background: transparent;
-  box-shadow: none;
-  color: #00acc1;
-  font-size: 28px;
-}
-
-.friend-item.add-friend .friend-avatar::after {
-  display: none;
-}
-
-
-.friends-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.friends-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.friends-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 4px;
-}
-
-
-.friends-container .empty {
-  padding: 16px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--muted, #777);
+  font-size: 24px;
+  color: #fff;
 }

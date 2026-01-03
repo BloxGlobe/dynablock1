@@ -1,8 +1,11 @@
 // src/main.js
 
-import "./core-modules/auth-module/auth.js"; // auth bootstraps first
-import initRouter from "./router.js";
+import "./core-modules/auth-module/auth.js";
+import App from "./router.svelte";
 
-document.addEventListener("DOMContentLoaded", () => {
-  initRouter();
+// Initialize Svelte app
+const app = new App({
+  target: document.body
 });
+
+export default app;

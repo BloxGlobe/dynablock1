@@ -5,7 +5,7 @@ if (!document.getElementById("library-css")) {
   const link = document.createElement("link");
   link.id = "library-css";
   link.rel = "stylesheet";
-  link.href = "src/utils/css/libraries/library.css";
+  link.href = "src/utils/css/libraries.css/library.css";
   document.head.appendChild(link);
 }
 

@@ -1,0 +1,35 @@
+
+.friends-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background-color: var(--panel);
+    border-radius: 12px; 
+    transition: background 0.2s;
+}
+
+.friend-item:hover {
+    background-color: var(--hover);
+}
+
+.friend-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 2px solid var(--border); 
+}
+
+.friend-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+}

@@ -5,7 +5,7 @@ if (!document.getElementById("settings-css")) {
   const link = document.createElement("link");
   link.id = "settings-css";
   link.rel = "stylesheet";
-  link.href = "src/utils/css/setting.css";
+  link.href = "src/utils/css/settings/settings.css";
   document.head.appendChild(link);
 }
 

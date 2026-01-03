@@ -37,19 +37,19 @@ export default function initRouter() {
     }
   }
 
-  // click handling (router OWNS navigation)
+
   links.forEach(link => {
     link.addEventListener("click", () => {
       navigate(link.dataset.page);
     });
   });
 
-  // hash handling (back/forward / direct URL)
+
   window.addEventListener("hashchange", () => {
     const page = location.hash.replace("#", "") || "home";
     render(page);
   });
 
-  // initial load
+
   navigate(location.hash.replace("#", "") || "home");
 }

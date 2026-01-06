@@ -7,6 +7,82 @@ import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
 // Store React roots for cleanup
 const reactRoots = new Map();
 
+// Simple SessionManager used by non-React code (window.SessionManager)
+const STORAGE_KEYS = {
+  TOKEN: 'auth_token',
+  USER: 'user_data',
+  REMEMBER: 'remember_me'
+};
+
+const SimpleSessionManager = {
+  _user: null,
+  _token: null,
+
+  _load() {
+    try {
+      const token = localStorage.getItem(STORAGE_KEYS.TOKEN) || sessionStorage.getItem(STORAGE_KEYS.TOKEN);
+      const user = localStorage.getItem(STORAGE_KEYS.USER) || sessionStorage.getItem(STORAGE_KEYS.USER);
+
+      this._token = token || null;
+      this._user = user ? JSON.parse(user) : null;
+    } catch (e) {
+      this._token = null;
+      this._user = null;
+    }
+  },
+
+  login(user, token, remember = false) {
+    this._user = user || null;
+    this._token = token || null;
+
+    try {
+      const storage = remember ? localStorage : sessionStorage;
+      if (this._token) storage.setItem(STORAGE_KEYS.TOKEN, this._token);
+      if (this._user) storage.setItem(STORAGE_KEYS.USER, JSON.stringify(this._user));
+      if (remember) localStorage.setItem(STORAGE_KEYS.REMEMBER, '1');
+    } catch (e) {
+      console.warn('Session storage failed:', e);
+    }
+
+    return true;
+  },
+
+  logout() {
+    this._user = null;
+    this._token = null;
+    try {
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      localStorage.removeItem(STORAGE_KEYS.REMEMBER);
+      sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+      sessionStorage.removeItem(STORAGE_KEYS.USER);
+    } catch (e) {
+      console.warn('Clearing session storage failed:', e);
+    }
+    return true;
+  },
+
+  isAuth() {
+    return !!this._token;
+  },
+
+  getUser() {
+    return this._user;
+  },
+
+  getToken() {
+    return this._token;
+  }
+};
+
+// Initialize and expose globally
+try {
+  SimpleSessionManager._load();
+  if (typeof window !== 'undefined') window.SessionManager = SimpleSessionManager;
+} catch (e) {
+  console.warn('Unable to initialize SessionManager:', e);
+}
+
 /**
  * Mount React component to DOM
  */
@@ -40,7 +116,7 @@ function unmountReactComponent(container) {
 export async function renderLogin(container) {
   try {
     // Import Routes component which handles login/register
-    const RoutesModule = await import('./routes.jsx');
+    const RoutesModule = await import('./routes/routes.jsx');
     const Routes = RoutesModule.default;
     
     // Mount React component
@@ -66,6 +142,15 @@ export async function renderLogin(container) {
 export async function renderRegister(container) {
   // Same as login - the Routes component handles both
   return renderLogin(container);
+}
+
+// Auto-mount when this module is loaded and an auth root exists
+if (typeof document !== 'undefined') {
+  const autoRoot = document.getElementById('auth-root');
+  if (autoRoot) {
+    // Fire-and-forget; errors are handled inside renderLogin
+    renderLogin(autoRoot).catch(err => console.error('Auto-mount auth failed:', err));
+  }
 }
 
 /**

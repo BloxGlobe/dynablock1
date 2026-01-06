@@ -10,25 +10,12 @@ if (!document.getElementById("settings-css")) {
 }
 
 let settingsOpen = false;
-let sessionManager = null;
-
-/**
- * Initialize session manager reference
- * Called from main.js
- */
-export function setSessionManager(manager) {
-  sessionManager = manager;
-}
 
 /**
  * Get current user from session
  */
 function getCurrentUser() {
-  if (sessionManager && sessionManager.user) {
-    return sessionManager.user;
-  }
-  
-  // Fallback to global SessionManager
+  // Get from global SessionManager (set by auth.js)
   if (window.SessionManager && window.SessionManager.user) {
     return window.SessionManager.user;
   }
@@ -167,9 +154,7 @@ function handleAction(e) {
 
     case "switch":
       console.log("Switch accounts");
-      if (window.openAccountSwitcher) {
-        window.openAccountSwitcher();
-      }
+      alert('Account switcher coming soon!');
       break;
 
     case "logout":
@@ -199,17 +184,12 @@ function handleLogout() {
   // Call logout from SessionManager
   if (window.SessionManager && typeof window.SessionManager.logout === 'function') {
     window.SessionManager.logout();
-  } else if (sessionManager && typeof sessionManager.logout === 'function') {
-    sessionManager.logout();
   }
 
-  // Navigate to home or login page
+  // Navigate to home
   if (window.navigateToPage) {
     window.navigateToPage('home');
   }
-
-  // Show success message
-  showNotification("You have been logged out successfully", "success");
 }
 
 /**
@@ -221,7 +201,6 @@ function positionPanel(panel, anchor) {
   panel.style.top = `${rect.bottom + 8}px`;
   panel.style.right = `${window.innerWidth - rect.right}px`;
   
-  // Make sure panel doesn't go off-screen
   setTimeout(() => {
     const panelRect = panel.getBoundingClientRect();
     
@@ -290,39 +269,3 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
-
-/**
- * Show notification message
- */
-function showNotification(message, type = "info") {
-  const notification = document.createElement("div");
-  notification.className = `notification notification-${type}`;
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 16px 24px;
-    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-    color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 10000;
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.opacity = '0';
-    notification.style.transition = 'opacity 0.3s';
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
-  }, 3000);
-}
-
-/* global hook for navbar */
-window.openSettings = e => {
-  e?.preventDefault();
-  initSettings(e.currentTarget);
-};

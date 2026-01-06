@@ -1,32 +1,33 @@
-# auth-module/register_login/register.py
-
-from flask import request, jsonify
-from uuid import uuid4
-from .store import save_user, user_exists
-from session_manager.session import save_session
+from flask import request, jsonify, make_response
 from werkzeug.security import generate_password_hash
+import jwt
+import os
+from datetime import datetime, timedelta
+
+from .. import user_db
+
+SECRET = os.environ.get("AUTH_SECRET", "dev-secret")
+
 
 def register():
-    data = request.json or {}
-
-    username = data.get("username") or data.get("name")
-    email = data.get("email")
+    data = request.get_json(force=True)
+    username = data.get("username")
     password = data.get("password")
+    email = data.get("email")
 
-    if not username or not email or not password:
-        return jsonify({"error": "Missing fields"}), 400
+    if not username or not password or not email:
+        return make_response(jsonify({"error": "username, email and password required"}), 400)
 
-    if user_exists(email):
-        return jsonify({"error": "User already exists"}), 400
+    user_db.init_db()
 
-    password_hash = generate_password_hash(password)
-    user = {
-        "id": str(uuid4()),
-        "username": username,
-        "email": email,
-        "password_hash": password_hash
-    }
+    if user_db.get_user_by_username(username):
+        return make_response(jsonify({"error": "username already exists"}), 409)
+    if user_db.get_user_by_email(email):
+        return make_response(jsonify({"error": "email already exists"}), 409)
 
-    save_user(user)
-    save_session({"id": user["id"], "username": user["username"], "email": user["email"]})
-    return jsonify({"id": user["id"], "username": user["username"], "email": user["email"]}), 201
+    pw_hash = generate_password_hash(password)
+    user_id = user_db.add_user(username, email, pw_hash)
+
+    token = jwt.encode({"user_id": user_id, "exp": datetime.utcnow() + timedelta(hours=24)}, SECRET, algorithm="HS256")
+
+    return make_response(jsonify({"token": token, "user": {"id": user_id, "username": username, "email": email}}), 201)

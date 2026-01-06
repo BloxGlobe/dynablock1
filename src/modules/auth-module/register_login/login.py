@@ -1,25 +1,31 @@
-# auth-module/register_login/login.py
-
-from flask import request, jsonify
-from .store import find_user_by_email
-from session_manager.session import save_session
+from flask import request, jsonify, make_response
 from werkzeug.security import check_password_hash
+import jwt
+import os
+from datetime import datetime, timedelta
+
+from .. import user_db
+
+SECRET = os.environ.get("AUTH_SECRET", "dev-secret")
+
 
 def login():
-    data = request.json or {}
-
-    email = data.get("email")
+    data = request.get_json(force=True)
+    username = data.get("username")
     password = data.get("password")
 
-    if not email or not password:
-        return jsonify({"error": "Missing credentials"}), 400
+    if not username or not password:
+        return make_response(jsonify({"error": "username and password required"}), 400)
 
-    user = find_user_by_email(email)
+    user_db.init_db()
+
+    user = user_db.get_user_by_username(username)
     if not user:
-        return jsonify({"error": "Invalid credentials"}), 401
+        return make_response(jsonify({"error": "invalid credentials"}), 401)
 
-    if not check_password_hash(user.get("password_hash", ""), password):
-        return jsonify({"error": "Invalid credentials"}), 401
+    if not check_password_hash(user[3], password):
+        return make_response(jsonify({"error": "invalid credentials"}), 401)
 
-    save_session({"id": user["id"], "username": user["username"], "email": user["email"]})
-    return jsonify({"id": user["id"], "username": user["username"], "email": user["email"]}), 200
+    token = jwt.encode({"user_id": user[0], "exp": datetime.utcnow() + timedelta(hours=24)}, SECRET, algorithm="HS256")
+
+    return make_response(jsonify({"token": token, "user": {"id": user[0], "username": user[1], "email": user[2]}}), 200)

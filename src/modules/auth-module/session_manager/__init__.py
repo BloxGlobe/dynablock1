@@ -1,1 +1,1 @@
-"""Package initializer for session_manager"""
+# session_manager package

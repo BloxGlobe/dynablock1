@@ -1,117 +1,114 @@
-import "./modules/auth-module/auth.js";
+// src/main.js
+
 import initRouter from "./router.js";
 import { setSessionManager } from "./pages/settings.js";
-
-// Session state (in-memory storage for this demo)
-let currentSession = {
-  user: null,
-  token: null,
-  isAuthenticated: false
-};
+import { initAuth } from "./module/auth-module/auth.js";
 
 /**
- * Session Manager API
- * This provides the interface between your auth module and the rest of the app
+ * Session Manager
+ * Manages user authentication state across the entire app
  */
-const sessionManager = {
-  // Get current user
-  get user() {
-    return currentSession.user;
-  },
-  
-  // Get current token
-  get token() {
-    return currentSession.token;
-  },
-  
-  // Check if authenticated
-  get isAuthenticated() {
-    return currentSession.isAuthenticated;
-  },
+class SessionManager {
+  constructor() {
+    this.user = null;
+    this.token = null;
+    this.isAuthenticated = false;
+  }
 
   /**
-   * Initialize session (called after successful login)
+   * Login - Store user session
    */
   login(userData, authToken, rememberMe = false) {
-    currentSession.user = userData;
-    currentSession.token = authToken;
-    currentSession.isAuthenticated = true;
+    this.user = userData;
+    this.token = authToken;
+    this.isAuthenticated = true;
 
-    // In a real app, store in localStorage/sessionStorage:
-    // if (rememberMe) {
-    //   localStorage.setItem('auth_token', authToken);
-    //   localStorage.setItem('user_data', JSON.stringify(userData));
-    // } else {
-    //   sessionStorage.setItem('auth_token', authToken);
-    //   sessionStorage.setItem('user_data', JSON.stringify(userData));
-    // }
+    // Store in localStorage if remember me is checked
+    if (rememberMe) {
+      try {
+        localStorage.setItem('auth_token', authToken);
+        localStorage.setItem('user_data', JSON.stringify(userData));
+      } catch (error) {
+        console.warn('Could not store session:', error);
+      }
+    }
 
-    console.log('Session initialized:', userData.username);
+    console.log('✓ Session initialized:', userData.username);
     
-    // Emit custom event that other parts of app can listen to
+    // Emit login event
     window.dispatchEvent(new CustomEvent('session:login', { 
-      detail: { user: userData } 
+      detail: { user: userData, token: authToken } 
     }));
     
     return true;
-  },
+  }
 
   /**
-   * Clear session (logout)
+   * Logout - Clear user session
    */
   logout() {
-    const username = currentSession.user?.username;
+    const username = this.user?.username;
     
-    currentSession.user = null;
-    currentSession.token = null;
-    currentSession.isAuthenticated = false;
+    this.user = null;
+    this.token = null;
+    this.isAuthenticated = false;
 
-    // In a real app, clear storage:
-    // localStorage.removeItem('auth_token');
-    // localStorage.removeItem('user_data');
-    // sessionStorage.clear();
+    // Clear localStorage
+    try {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+    } catch (error) {
+      console.warn('Could not clear session:', error);
+    }
 
-    console.log('Session cleared:', username);
+    console.log('✓ Session cleared:', username);
     
-    // Emit custom event
+    // Emit logout event
     window.dispatchEvent(new CustomEvent('session:logout'));
     
     return true;
-  },
+  }
 
   /**
    * Update user data
    */
   updateUser(updates) {
-    if (!currentSession.user) return false;
+    if (!this.user) return false;
     
-    currentSession.user = { ...currentSession.user, ...updates };
-    
-    // In a real app, update storage:
-    // const storage = localStorage.getItem('auth_token') ? localStorage : sessionStorage;
-    // storage.setItem('user_data', JSON.stringify(currentSession.user));
+    this.user = { ...this.user, ...updates };
 
-    console.log('User data updated:', updates);
+    // Update localStorage if exists
+    try {
+      const storedToken = localStorage.getItem('auth_token');
+      if (storedToken) {
+        localStorage.setItem('user_data', JSON.stringify(this.user));
+      }
+    } catch (error) {
+      console.warn('Could not update user data:', error);
+    }
+
+    console.log('✓ User data updated:', updates);
     
-    // Emit custom event
+    // Emit update event
     window.dispatchEvent(new CustomEvent('session:update', { 
-      detail: { user: currentSession.user } 
+      detail: { user: this.user } 
     }));
     
     return true;
-  },
+  }
 
   /**
-   * Verify token is still valid
+   * Verify if token is still valid
    */
   verifyToken() {
-    if (!currentSession.token) return false;
+    if (!this.token) return false;
     
     try {
-      const decoded = JSON.parse(atob(currentSession.token));
+      const decoded = JSON.parse(atob(this.token));
       
       // Check if token expired
       if (decoded.exp < Date.now()) {
+        console.warn('Token expired');
         this.logout();
         return false;
       }
@@ -121,94 +118,117 @@ const sessionManager = {
       console.error('Token verification failed:', error);
       return false;
     }
-  },
+  }
 
   /**
-   * Get session duration remaining (in minutes)
+   * Get remaining session time in minutes
    */
   getSessionDuration() {
-    if (!currentSession.token) return 0;
+    if (!this.token) return 0;
     
     try {
-      const decoded = JSON.parse(atob(currentSession.token));
+      const decoded = JSON.parse(atob(this.token));
       const remaining = decoded.exp - Date.now();
       return Math.floor(remaining / 1000 / 60);
     } catch {
       return 0;
     }
-  },
+  }
 
   /**
-   * Restore session from storage (on app load)
+   * Restore session from localStorage
    */
   restoreSession() {
-    // In a real app, check localStorage/sessionStorage:
-    // const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
-    // const userData = localStorage.getItem('user_data') || sessionStorage.getItem('user_data');
-    
-    // if (token && userData) {
-    //   try {
-    //     const user = JSON.parse(userData);
-    //     const decoded = JSON.parse(atob(token));
-    //     
-    //     // Verify token not expired
-    //     if (decoded.exp > Date.now()) {
-    //       currentSession.user = user;
-    //       currentSession.token = token;
-    //       currentSession.isAuthenticated = true;
-    //       console.log('Session restored:', user.username);
-    //       return true;
-    //     }
-    //   } catch (error) {
-    //     console.error('Session restoration failed:', error);
-    //   }
-    // }
+    try {
+      const token = localStorage.getItem('auth_token');
+      const userData = localStorage.getItem('user_data');
+      
+      if (token && userData) {
+        const user = JSON.parse(userData);
+        
+        // Check if token is still valid
+        const decoded = JSON.parse(atob(token));
+        if (decoded.exp > Date.now()) {
+          this.user = user;
+          this.token = token;
+          this.isAuthenticated = true;
+          console.log('✓ Session restored:', user.username);
+          return true;
+        } else {
+          // Token expired, clear it
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_data');
+          console.log('Token expired, cleared');
+        }
+      }
+    } catch (error) {
+      console.error('Session restoration failed:', error);
+    }
     
     return false;
   }
-};
+
+  /**
+   * Get current user
+   */
+  getUser() {
+    return this.user;
+  }
+
+  /**
+   * Check if authenticated
+   */
+  isAuth() {
+    return this.isAuthenticated && this.verifyToken();
+  }
+}
+
+// Create singleton instance
+const sessionManager = new SessionManager();
 
 /**
  * Initialize the application
  */
 function initApp() {
-  console.log('Initializing DynaBlocks...');
+  console.log('🚀 Initializing DynaBlocks...');
+  
+  // Expose SessionManager globally
+  window.SessionManager = sessionManager;
   
   // Try to restore previous session
   sessionManager.restoreSession();
   
-  // Connect session manager to settings
+  // Connect session manager to settings dropdown
   setSessionManager(sessionManager);
   
-  // Initialize router
-  initRouter();
+  // Initialize auth module (React components)
+  initAuth();
   
-  // Set up global navigation helper
+  // Set up global navigation helpers
   setupNavigationHelpers();
   
   // Set up session event listeners
   setupSessionListeners();
   
-  console.log('DynaBlocks initialized!');
+  // Initialize router
+  initRouter();
+  
+  console.log('✓ DynaBlocks initialized successfully!');
 }
 
 /**
  * Set up global navigation helpers
  */
 function setupNavigationHelpers() {
-  // Global navigation function that other modules can use
+  // Global navigation function
   window.navigateToPage = (page) => {
-    console.log('Navigating to:', page);
-    
-    // Your router should handle this
-    // For now, just log it
+    console.log('→ Navigating to:', page);
     window.location.hash = `#${page}`;
   };
   
-  // Account switcher (placeholder for future feature)
+  // Account switcher (future feature)
   window.openAccountSwitcher = () => {
-    console.log('Account switcher not yet implemented');
-    alert('Account switcher coming soon!');
+    showNotification('Account switcher coming soon!', 'info');
   };
 }
 
@@ -218,23 +238,24 @@ function setupNavigationHelpers() {
 function setupSessionListeners() {
   // Listen for login events
   window.addEventListener('session:login', (e) => {
-    console.log('User logged in:', e.detail.user);
-    
-    // Update UI, show welcome message, etc.
+    console.log('✓ User logged in:', e.detail.user.username);
     showWelcomeMessage(e.detail.user.username);
   });
   
   // Listen for logout events
   window.addEventListener('session:logout', () => {
-    console.log('User logged out');
+    console.log('✓ User logged out');
+    showNotification('You have been logged out', 'info');
     
-    // Redirect to home/login, update UI, etc.
-    window.navigateToPage('home');
+    // Redirect to home
+    setTimeout(() => {
+      window.navigateToPage('home');
+    }, 500);
   });
   
   // Listen for user update events
   window.addEventListener('session:update', (e) => {
-    console.log('User data updated:', e.detail.user);
+    console.log('✓ User data updated:', e.detail.user);
   });
 }
 
@@ -242,34 +263,78 @@ function setupSessionListeners() {
  * Show welcome message after login
  */
 function showWelcomeMessage(username) {
+  showNotification(`Welcome back, ${username}!`, 'success');
+}
+
+/**
+ * Show notification message
+ */
+function showNotification(message, type = 'info') {
+  const colors = {
+    success: '#10b981',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    info: '#3b82f6'
+  };
+
   const notification = document.createElement('div');
-  notification.className = 'notification notification-success';
-  notification.textContent = `Welcome back, ${username}!`;
+  notification.className = 'app-notification';
+  notification.textContent = message;
   notification.style.cssText = `
     position: fixed;
     top: 20px;
     right: 20px;
     padding: 16px 24px;
-    background: #10b981;
+    background: ${colors[type] || colors.info};
     color: white;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 10000;
-    animation: slideIn 0.3s ease-out;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideInRight 0.3s ease-out;
+    max-width: 400px;
   `;
+  
+  // Add animation styles if not already present
+  if (!document.getElementById('notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.textContent = `
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
   
   document.body.appendChild(notification);
   
+  // Auto-remove after 3 seconds
   setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease-out';
-    setTimeout(() => notification.remove(), 300);
+    notification.style.animation = 'slideOutRight 0.3s ease-out';
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
   }, 3000);
 }
-
-/**
- * Expose session manager globally for auth module to use
- */
-window.SessionManager = sessionManager;
 
 /**
  * Start the app when DOM is ready
@@ -277,26 +342,12 @@ window.SessionManager = sessionManager;
 document.addEventListener("DOMContentLoaded", initApp);
 
 /**
- * Example: How your auth module would use this
- * 
- * In src/module/auth-module/auth.js:
- * 
- * export async function login(credentials) {
- *   const result = await loginAPI(credentials);
- *   
- *   if (result.success) {
- *     // Store session
- *     window.SessionManager.login(result.user, result.token, rememberMe);
- *     
- *     // Navigate to dashboard
- *     window.navigateToPage('dashboard');
- *   }
- *   
- *   return result;
- * }
- * 
- * export function logout() {
- *   window.SessionManager.logout();
- *   window.navigateToPage('login');
- * }
+ * Handle errors globally
  */
+window.addEventListener('error', (event) => {
+  console.error('Global error:', event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+});

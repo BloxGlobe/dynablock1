@@ -44,7 +44,7 @@
       <button
         class="icon-btn settings-btn"
         aria-label="Settings"
-        onclick="openSettings?.(event)"
+        id="settingsButton"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3"></circle>
@@ -65,6 +65,25 @@
   <!-- App entry -->
   <script type="module" src="src/main.js"></script>
 
+  <!-- Initialize settings button -->
+  <script type="module">
+    import { initSettings } from "./src/pages/settings.js";
+    
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', () => {
+      const settingsButton = document.getElementById('settingsButton');
+      
+      if (settingsButton) {
+        settingsButton.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          initSettings(event.currentTarget);
+        });
+      }
+    });
+  </script>
+
+  <!-- Initialize footer -->
   <script type="module">
     import initFooter from "./src/components/common/footer.js";
     const footerRoot = document.getElementById("footer-root");

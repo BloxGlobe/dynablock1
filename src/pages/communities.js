@@ -1,4 +1,4 @@
-// load css once
+// Load CSS once
 if (!document.getElementById("communities-css")) {
   const link = document.createElement("link");
   link.id = "communities-css";
@@ -10,7 +10,7 @@ if (!document.getElementById("communities-css")) {
 let communities = [];
 let currentCommunity = null;
 
-function initCommunities(container) {
+export function initCommunities(container) {
   if (!container) return;
 
   container.innerHTML = `
@@ -35,6 +35,7 @@ function initCommunities(container) {
   setupEvents();
   renderSidebar();
   renderEmptyState();
+}
 
 function setupEvents() {
   const search = document.querySelector(".search-communities input");
@@ -64,7 +65,7 @@ function renderSidebar(filter = "") {
 
   list.innerHTML = filtered.map(c => `
     <div class="community-item ${currentCommunity?.id === c.id ? "active" : ""}" data-id="${c.id}">
-      <img src="${c.icon}" />
+      <img src="${c.icon}" alt="${c.name}" />
       <div class="community-meta">
         <div class="community-name">${c.name}</div>
         <div class="community-members">${formatMembers(c.members)} members</div>
@@ -106,7 +107,7 @@ function renderCommunity() {
 
   content.innerHTML = `
     <div class="community-banner">
-      <img class="community-avatar" src="${currentCommunity.icon}" />
+      <img class="community-avatar" src="${currentCommunity.icon}" alt="${currentCommunity.name}" />
       <div class="community-info">
         <h1>${currentCommunity.name}</h1>
         <div class="community-creator">By ${currentCommunity.creator}</div>
@@ -148,7 +149,7 @@ function renderShouts() {
 
   return currentCommunity.shouts.map(s => `
     <div class="shout-item">
-      <img src="${s.avatar}" />
+      <img src="${s.avatar}" alt="${s.author}" />
       <div>
         <div class="shout-header">
           <strong>${s.author}</strong>
@@ -166,7 +167,7 @@ function renderMembers() {
   }
 
   return currentCommunity.members_list.slice(0, 20).map(m => `
-    <img class="member-avatar" src="${m.avatar}" title="${m.name}" />
+    <img class="member-avatar" src="${m.avatar}" title="${m.name}" alt="${m.name}" />
   `).join("");
 }
 

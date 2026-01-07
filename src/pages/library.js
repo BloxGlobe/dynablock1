@@ -1,6 +1,6 @@
 // src/pages/library.js
 
-/* load css once */
+// Load CSS once
 if (!document.getElementById("library-css")) {
   const link = document.createElement("link");
   link.id = "library-css";
@@ -10,6 +10,8 @@ if (!document.getElementById("library-css")) {
 }
 
 export default function initLibrary(container) {
+  if (!container) return;
+
   container.innerHTML = `
     <div id="userBanner" style="margin-bottom:12px"></div>
     <div class="library-page">
@@ -63,7 +65,10 @@ export default function initLibrary(container) {
     </div>
   `;
 
-/* card helpers */
+  setupLibraryEvents();
+}
+
+/* Card Helpers */
 
 function renderUserCard(name) {
   return `
@@ -90,4 +95,29 @@ function renderGenericCard(label) {
       <span>${label}</span>
     </div>
   `;
-} 
+}
+
+/* Events */
+
+function setupLibraryEvents() {
+  const seeAllButtons = document.querySelectorAll('.see-all');
+  
+  seeAllButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const section = e.target.closest('.library-section');
+      const title = section.querySelector('h2').textContent;
+      alert(`Viewing all ${title}...`);
+    });
+  });
+
+  const cards = document.querySelectorAll('.library-card');
+  
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const name = card.querySelector('span').textContent;
+      alert(`Opening ${name}...`);
+    });
+  });
+}
+
+window.initLibrary = initLibrary;
